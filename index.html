@@ -2,55 +2,86 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>ランダム警告（ジョーク）</title>
+<title>エラーログ風ジョーク画面</title>
 <style>
   body {
     margin: 0;
     background: #000;
-    color: #f33;
+    color: #0f0;
     font-family: "Consolas", "Courier New", monospace;
-    padding: 20px;
-    font-size: 18px;
+    font-size: 14px;
   }
   #log {
+    padding: 10px;
     white-space: pre-wrap;
+  }
+  #bar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    background: #111;
+    color: #0f0;
+    padding: 5px 10px;
+    font-size: 12px;
+    border-left: 1px solid #0f0;
+    border-bottom: 1px solid #0f0;
+  }
+  button {
+    background: #0f0;
+    color: #000;
+    border: none;
+    padding: 3px 8px;
+    cursor: pointer;
+    font-size: 12px;
   }
 </style>
 </head>
 <body>
 
-<div id="log">システム監視中...\n</div>
+<div id="bar">
+  フェイクログ（ジョーク） |
+  <button id="stopBtn">停止</button>
+</div>
+<div id="log"></div>
 
 <script>
-const warnings = [
-  "警告: 予期しない動作を検出…（かもしれません）",
-  "注意: システムがあなたを見つめています。",
-  "警告: 何かが起きているような気がします。",
-  "注意: これはジョークの可能性があります。",
-  "警告: 深刻な問題…は特にありません。",
-  "注意: コーヒーの摂取量が不足しています。",
-  "警告: あなたのPCは今日も元気です。",
-  "注意: そろそろネタバレが近いです。"
+const log = document.getElementById("log");
+const stopBtn = document.getElementById("stopBtn");
+
+const errors = [
+  "ERROR: Something unexpected happened. (たぶん気のせいです)",
+  "WARN : System detected high level of 眠気.",
+  "ERROR: CoffeeNotFoundException at line 42.",
+  "WARN : User is staring at the screen suspiciously.",
+  "ERROR: Unable to locate motivation.dll",
+  "WARN : Overload of awesome detected.",
+  "ERROR: This error message is 100%ジョークです。",
+  "WARN : No real damage is being done."
 ];
 
-const log = document.getElementById("log");
-let count = 0;
+let running = true;
 
-function addWarning() {
-  const msg = warnings[Math.floor(Math.random() * warnings.length)];
-  log.textContent += msg + "\n";
-  count++;
+function addLine() {
+  if (!running) return;
+  const now = new Date().toISOString();
+  const msg = errors[Math.floor(Math.random() * errors.length)];
+  log.textContent += `[${now}] ${msg}\n`;
 
-  if (count === 8) {
-    log.textContent += "\n==============================\n";
-    log.textContent += "  これはジョーク画面です。\n";
-    log.textContent += "  PCはハッキングされていません。\n";
-    log.textContent += "  ブラウザを閉じれば終わりです。\n";
-    log.textContent += "==============================\n";
+  // ログが長くなりすぎたら先頭を少し削る
+  if (log.textContent.length > 8000) {
+    log.textContent = log.textContent.slice(log.textContent.length - 8000);
   }
+
+  // 自動スクロール
+  window.scrollTo(0, document.body.scrollHeight);
 }
 
-setInterval(addWarning, 800);
+const timer = setInterval(addLine, 150);
+
+stopBtn.addEventListener("click", () => {
+  running = !running;
+  stopBtn.textContent = running ? "停止" : "再開";
+});
 </script>
 
 </body>
